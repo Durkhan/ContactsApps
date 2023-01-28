@@ -1,7 +1,6 @@
 package com.vholodynskyi.assignment.ui.contactslist
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -66,6 +65,10 @@ open class ContactsListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         datastore = AppPreferences(requireContext().datastore)
 
+        binding?.pullToRefresh?.setOnRefreshListener {
+            getDataFromDatabase()
+            binding!!.pullToRefresh.isRefreshing = false
+        }
         lifecycleScope.launch(){
             if (datastore.isEmpty.first()){
                 getLivedataObserver()
