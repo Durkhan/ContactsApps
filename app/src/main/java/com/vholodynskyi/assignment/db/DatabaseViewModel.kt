@@ -14,7 +14,6 @@ import kotlinx.coroutines.launch
 
 class DatabaseViewModel(var databaseRepository: DatabaseRepository) : ViewModel() {
     var contact = MutableLiveData<DbContact>()
-
     fun insert(items:List<DbContact>) {
         viewModelScope.launch {
             databaseRepository.insert(items)
@@ -34,6 +33,9 @@ class DatabaseViewModel(var databaseRepository: DatabaseRepository) : ViewModel(
                 e.printStackTrace()
             }
         }
+    }
+    fun getContactDeleteById(id:Int){
+        return databaseRepository.getContactDeleteById(id)
     }
 
 

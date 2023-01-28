@@ -23,8 +23,11 @@ class DatabaseRepository(private var contactsDao: ContactsDao){
         return contactsDao.getContactById(id)
     }
 
-
-
+    fun getContactDeleteById(id: Int) {
+        CoroutineScope(Dispatchers.IO).launch {
+            contactsDao.deleteById(id)
+        }
+    }
 
 
 }

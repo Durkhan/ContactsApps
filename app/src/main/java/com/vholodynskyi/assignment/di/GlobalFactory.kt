@@ -11,7 +11,6 @@ import com.vholodynskyi.assignment.db.AppDatabase
 import com.vholodynskyi.assignment.db.DatabaseViewModel
 import com.vholodynskyi.assignment.repositories.DatabaseRepository
 import com.vholodynskyi.assignment.ui.contactslist.ContactsListViewModel
-import com.vholodynskyi.assignment.ui.details.DetailsViewModel
 
 object GlobalFactory: ViewModelProvider.Factory {
 

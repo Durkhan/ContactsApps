@@ -8,8 +8,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
+import com.vholodynskyi.assignment.R
 import com.vholodynskyi.assignment.databinding.FragmentDetailsBinding
 import com.vholodynskyi.assignment.db.DatabaseViewModel
 import com.vholodynskyi.assignment.di.GlobalFactory
@@ -46,6 +48,12 @@ open class DetailsFragment : Fragment() {
                     context?.let { Glide.with(it).load(dbContact.photo).into(medium) }
                 }
             })
+        }
+
+
+        binding!!.delete.setOnClickListener {
+            databaseViewModel.getContactDeleteById(args.id)
+            findNavController().navigate(R.id.action_details_to_contactList1)
         }
 
     }
