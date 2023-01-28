@@ -7,10 +7,16 @@
         <action
             android:id="@+id/action_contactList_to_details"
             app:destination="@id/details">
-            <argument android:name="id" app:argType="string" app:nullable="true"/>
+
         </action>
     </fragment>
     <fragment android:name="com.vholodynskyi.assignment.ui.details.DetailsFragment" android:id="@+id/details">
-        <argument android:name="id" app:argType="string" app:nullable="true"/>
+        <argument
+            android:name="id"
+            app:argType="integer"
+            android:defaultValue="0" />
+        <action
+            android:id="@+id/action_details_to_contactList1"
+            app:destination="@id/contactList" />
     </fragment>
 </navigation>

@@ -37,7 +37,7 @@ open class ContactsListFragment : Fragment() {
     private val databaseViewModel:DatabaseViewModel by activityViewModels{GlobalFactory}
     private var contactsList= arrayListOf<DbContact>()
 
-    private fun onContactClicked(id:String) {
+    private fun onContactClicked(id:Int) {
         findNavController()
             .navigate(ContactsListFragmentDirections.actionContactListToDetails(id))
     }

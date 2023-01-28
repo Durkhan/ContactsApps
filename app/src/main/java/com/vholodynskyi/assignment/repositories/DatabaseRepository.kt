@@ -19,6 +19,9 @@ class DatabaseRepository(private var contactsDao: ContactsDao){
         return contactsDao.getContacts()
     }
 
+    fun getContactById(id: Int): DbContact {
+        return contactsDao.getContactById(id)
+    }
 
 
 

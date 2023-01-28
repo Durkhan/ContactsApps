@@ -14,6 +14,9 @@ interface ContactsDao {
     @Insert
     suspend fun addAll(contact: List<DbContact>)
 
+    @Query("SELECT * FROM Contact WHERE id = :contactId")
+    fun getContactById(contactId: Int): DbContact
+
     @Query("DELETE FROM Contact WHERE id = (:contactId)")
     suspend fun deleteById(contactId: Int)
 

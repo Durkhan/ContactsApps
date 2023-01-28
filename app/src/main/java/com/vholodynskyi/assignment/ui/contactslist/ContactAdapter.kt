@@ -5,7 +5,6 @@ import android.app.Activity
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.vholodynskyi.assignment.api.contacts.ApiContact
 import com.vholodynskyi.assignment.databinding.ItemContactListBinding
 import com.vholodynskyi.assignment.db.contacts.DbContact
 
@@ -32,7 +31,7 @@ class ContactAdapter (
         with(holder.binding) {
             text.text = item.firstName+ "\n"+item.email.toString()
             root.setOnClickListener {
-                onItemClicked(item.id.toString())
+                onItemClicked(item.id)
             }
         }
     }
@@ -44,4 +43,4 @@ class ContactAdapter (
 
 class ViewHolder (val binding: ItemContactListBinding) : RecyclerView.ViewHolder(binding.root)
 
-typealias ItemClick = (String) -> Unit
+typealias ItemClick = (Int) -> Unit
