@@ -7,13 +7,14 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.vholodynskyi.assignment.api.contacts.ApiContact
 import com.vholodynskyi.assignment.databinding.ItemContactListBinding
+import com.vholodynskyi.assignment.db.contacts.DbContact
 
 class ContactAdapter (
     private val context: Activity,
     private val onItemClicked: ItemClick
 ) : RecyclerView.Adapter<ViewHolder>() {
 
-    var items: List<ApiContact> = listOf()
+    var items: List<DbContact> = listOf()
         set(value) {
             field = value
             notifyDataSetChanged()
@@ -29,9 +30,9 @@ class ContactAdapter (
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = items[position]
         with(holder.binding) {
-            text.text = item.name?.firstName+"\n"+item.email
+            text.text = item.firstName+ "\n"+item.email.toString()
             root.setOnClickListener {
-                onItemClicked(item.name.toString())
+                onItemClicked(item.id.toString())
             }
         }
     }

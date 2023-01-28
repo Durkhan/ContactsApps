@@ -1,11 +1,12 @@
 package com.vholodynskyi.assignment.db.contacts
 
+import androidx.lifecycle.LiveData
 import androidx.room.*
 
 @Dao
 interface ContactsDao {
     @Query("SELECT * FROM Contact")
-    suspend fun getContacts(): List<DbContact>
+    fun getContacts(): LiveData<List<DbContact>>
 
     @Update
     suspend fun update(contact: DbContact)

@@ -1,6 +1,7 @@
 package com.vholodynskyi.assignment.ui.contactslist
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,23 +10,34 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.vholodynskyi.assignment.api.utility.FollowData
+import com.vholodynskyi.assignment.utility.FollowData
+import com.vholodynskyi.assignment.api.contacts.ApiContact
+import com.vholodynskyi.assignment.utility.AppPreferences
+import com.vholodynskyi.assignment.utility.datastore
 import com.vholodynskyi.assignment.databinding.FragmentContactsListBinding
+import com.vholodynskyi.assignment.db.DatabaseViewModel
+import com.vholodynskyi.assignment.db.contacts.DbContact
 import com.vholodynskyi.assignment.di.GlobalFactory
-import kotlinx.coroutines.test.withTestContext
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 open class ContactsListFragment : Fragment() {
-    private val contactsListViewModel:ContactsListViewModel by activityViewModels { GlobalFactory }
+
     private val contactAdapter: ContactAdapter by lazy {
         ContactAdapter(
             requireActivity(),
             this::onContactClicked
         )
     }
+    private lateinit var datastore:AppPreferences
+    private val contactsListViewModel:ContactsListViewModel by activityViewModels { GlobalFactory}
+    private val databaseViewModel:DatabaseViewModel by activityViewModels{GlobalFactory}
+    private var contactsList= arrayListOf<DbContact>()
 
-    private fun onContactClicked(id: String) {
+    private fun onContactClicked(id:String) {
         findNavController()
             .navigate(ContactsListFragmentDirections.actionContactListToDetails(id))
     }
@@ -47,12 +59,27 @@ open class ContactsListFragment : Fragment() {
                 binding = it
             }
             .root
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        getLivedataObserver()
+        datastore = AppPreferences(requireContext().datastore)
+
+        lifecycleScope.launch(){
+            if (datastore.isEmpty.first()){
+                getLivedataObserver()
+            }
+            else{
+                getDataFromDatabase()
+
+            }
+        }
+
+
+
     }
+
     private fun getLivedataObserver() {
         contactsListViewModel.liveDatalistofContacts.observe(viewLifecycleOwner, Observer {
             when(it) {
@@ -66,14 +93,45 @@ open class ContactsListFragment : Fragment() {
                 }
 
                 is FollowData.Success -> {
-                    contactAdapter.items=it.isSuccess
-                    binding?.progressBar?.isVisible = false
+                    addDatatoDatabase(it.isSuccess)
 
                 }
             }
         })
 
     }
+
+    private fun addDatatoDatabase(items: List<ApiContact>) {
+        for (contact in items){
+            var dbContact=DbContact(id = 0,
+                contact.name?.firstName,
+                contact.name?.lastName,
+                contact.email,
+                contact.picture!!.medium
+            )
+            contactsList.add(dbContact)
+        }
+        databaseViewModel.insert(contactsList)
+        binding?.progressBar?.isVisible = false
+
+        lifecycleScope.launch {
+            datastore.setIsNotEmpty(false)
+        }
+
+        getDataFromDatabase()
+
+    }
+    private fun getDataFromDatabase(){
+        databaseViewModel.getAllContacts().observe(viewLifecycleOwner, Observer {contacts->
+            contacts?.let {
+                contactAdapter.items = it
+            }
+
+        })
+        binding?.progressBar?.isVisible = false
+
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null

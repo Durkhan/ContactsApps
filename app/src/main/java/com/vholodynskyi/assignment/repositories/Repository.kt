@@ -1,6 +1,6 @@
-package com.vholodynskyi.assignment.api.repositories
+package com.vholodynskyi.assignment.repositories
 
-import com.vholodynskyi.assignment.api.utility.FollowData
+import com.vholodynskyi.assignment.utility.FollowData
 import com.vholodynskyi.assignment.di.GlobalFactory
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow

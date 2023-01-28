@@ -1,4 +1,4 @@
-package com.vholodynskyi.assignment.api.utility
+package com.vholodynskyi.assignment.utility
 
 import com.vholodynskyi.assignment.api.contacts.ApiContact
 import com.vholodynskyi.assignment.api.contacts.ApiContactResponse

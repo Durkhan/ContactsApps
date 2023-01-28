@@ -6,8 +6,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.room.Room
 import com.vholodynskyi.assignment.api.RetrofitServicesProvider
 import com.vholodynskyi.assignment.api.contacts.ContactsService
-import com.vholodynskyi.assignment.api.repositories.Repository
+import com.vholodynskyi.assignment.repositories.Repository
 import com.vholodynskyi.assignment.db.AppDatabase
+import com.vholodynskyi.assignment.db.DatabaseViewModel
+import com.vholodynskyi.assignment.repositories.DatabaseRepository
 import com.vholodynskyi.assignment.ui.contactslist.ContactsListViewModel
 import com.vholodynskyi.assignment.ui.details.DetailsViewModel
 
@@ -30,7 +32,7 @@ object GlobalFactory: ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         return when (modelClass) {
             ContactsListViewModel::class.java -> ContactsListViewModel(Repository())
-            DetailsViewModel::class.java -> DetailsViewModel()
+            DatabaseViewModel::class.java -> DatabaseViewModel(DatabaseRepository(db.userDao()))
             else -> throw IllegalArgumentException("Cannot create factory for ${modelClass.simpleName}")
         } as T
     }
