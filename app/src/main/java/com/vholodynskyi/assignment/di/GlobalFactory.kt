@@ -11,6 +11,7 @@ import com.vholodynskyi.assignment.db.AppDatabase
 import com.vholodynskyi.assignment.db.DatabaseViewModel
 import com.vholodynskyi.assignment.repositories.DatabaseRepository
 import com.vholodynskyi.assignment.ui.contactslist.ContactsListViewModel
+import com.vholodynskyi.assignment.utility.CustomDelegate
 
 object GlobalFactory: ViewModelProvider.Factory {
 
@@ -27,6 +28,7 @@ object GlobalFactory: ViewModelProvider.Factory {
             "app-database"
         ).build()
     }
+    var customDelegate: String by CustomDelegate("initial value")
 
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         return when (modelClass) {

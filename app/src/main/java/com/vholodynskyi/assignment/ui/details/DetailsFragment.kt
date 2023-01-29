@@ -1,6 +1,7 @@
 package com.vholodynskyi.assignment.ui.details
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -39,6 +40,7 @@ open class DetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         databaseViewModel.getContactById(args.id)
+        Log.d("Delegates",GlobalFactory.customDelegate)
         lifecycleScope.launch {
             databaseViewModel.contact.observe(viewLifecycleOwner, Observer {dbContact->
                 with(binding!!){

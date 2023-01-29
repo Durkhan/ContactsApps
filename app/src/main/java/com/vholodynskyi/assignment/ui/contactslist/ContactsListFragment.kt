@@ -3,6 +3,7 @@ package com.vholodynskyi.assignment.ui.contactslist
 import android.annotation.SuppressLint
 import android.graphics.Canvas
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -69,6 +70,8 @@ open class ContactsListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         datastore = AppPreferences(requireContext().datastore)
+        Log.d("Delegates",GlobalFactory.customDelegate)
+        GlobalFactory.customDelegate="value changed"
 
         binding?.pullToRefresh?.setOnRefreshListener {
             getDataFromDatabase()
