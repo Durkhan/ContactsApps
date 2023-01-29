@@ -1,5 +1,7 @@
 package com.vholodynskyi.assignment.ui.contactslist
 
+import android.annotation.SuppressLint
+import android.graphics.Canvas
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,7 +13,9 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.vholodynskyi.assignment.utility.FollowData
 import com.vholodynskyi.assignment.api.contacts.ApiContact
 import com.vholodynskyi.assignment.utility.AppPreferences
@@ -20,6 +24,7 @@ import com.vholodynskyi.assignment.databinding.FragmentContactsListBinding
 import com.vholodynskyi.assignment.db.DatabaseViewModel
 import com.vholodynskyi.assignment.db.contacts.DbContact
 import com.vholodynskyi.assignment.di.GlobalFactory
+import com.vholodynskyi.assignment.utility.SwipeToDelete
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -78,7 +83,7 @@ open class ContactsListFragment : Fragment() {
 
             }
         }
-
+       swipetodelete()
 
 
     }
@@ -134,7 +139,61 @@ open class ContactsListFragment : Fragment() {
         binding?.progressBar?.isVisible = false
 
     }
+    private fun swipetodelete() {
+        val swipeToDelete=object: SwipeToDelete(){
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                databaseViewModel.getContactDeleteById(contactAdapter.items[viewHolder.adapterPosition].id)
+                contactAdapter.notifyDataSetChanged()
+            }
 
+            @SuppressLint("NotifyDataSetChanged")
+            override fun onChildDraw(
+                c: Canvas,
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                dX: Float,
+                dY: Float,
+                actionState: Int,
+                isCurrentlyActive: Boolean
+            ) {
+                super.onChildDraw(
+                    c,
+                    recyclerView,
+                    viewHolder,
+                    dX,
+                    dY,
+                    actionState,
+                    isCurrentlyActive
+                )
+                val itemView = viewHolder.itemView
+
+                if (dX > 0) { // Swiping to the right
+                    viewHolder.itemView.background.setBounds(itemView.left, itemView.top,
+                        itemView.left,
+                        itemView.bottom)
+
+
+
+
+                } else if (dX < 0) { // Swiping to the left
+                    viewHolder.itemView.background.setBounds(itemView.right,
+                        itemView.top, itemView.right, itemView.bottom)
+                }
+                else { // view is un-swiped
+                    viewHolder.itemView.background.setBounds(0, 0, 0, 0);
+                }
+                viewHolder.itemView.background.draw(c)
+
+
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+
+            }
+
+        }
+        val itemTouchHelper= ItemTouchHelper(swipeToDelete)
+        itemTouchHelper.attachToRecyclerView(binding?.contactList)
+
+    }
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
