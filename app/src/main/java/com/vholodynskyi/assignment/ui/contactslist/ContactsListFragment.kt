@@ -19,10 +19,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.vholodynskyi.assignment.utility.FollowData
 import com.vholodynskyi.assignment.api.contacts.ApiContact
+import com.vholodynskyi.assignment.api.contacts.todbContact
 import com.vholodynskyi.assignment.utility.AppPreferences
 import com.vholodynskyi.assignment.utility.datastore
 import com.vholodynskyi.assignment.databinding.FragmentContactsListBinding
-import com.vholodynskyi.assignment.db.DatabaseViewModel
 import com.vholodynskyi.assignment.db.contacts.DbContact
 import com.vholodynskyi.assignment.di.GlobalFactory
 import com.vholodynskyi.assignment.utility.SwipeToDelete
@@ -39,9 +39,9 @@ open class ContactsListFragment : Fragment() {
     }
     private lateinit var datastore:AppPreferences
     private val contactsListViewModel:ContactsListViewModel by activityViewModels { GlobalFactory}
-    private val databaseViewModel:DatabaseViewModel by activityViewModels{GlobalFactory}
     private var contactsList= arrayListOf<DbContact>()
-
+    private var isRefresh=false
+    private var refreshList= arrayListOf<ApiContact>()
     private fun onContactClicked(id:Int) {
         findNavController()
             .navigate(ContactsListFragmentDirections.actionContactListToDetails(id))
@@ -74,12 +74,13 @@ open class ContactsListFragment : Fragment() {
         GlobalFactory.customDelegate="value changed"
 
         binding?.pullToRefresh?.setOnRefreshListener {
-            getDataFromDatabase()
+            isRefresh=true
+            getLivedataObserver(isRefresh)
             binding!!.pullToRefresh.isRefreshing = false
         }
         lifecycleScope.launch(){
             if (datastore.isEmpty.first()){
-                getLivedataObserver()
+                getLivedataObserver(isRefresh)
             }
             else{
                 getDataFromDatabase()
@@ -91,7 +92,7 @@ open class ContactsListFragment : Fragment() {
 
     }
 
-    private fun getLivedataObserver() {
+    private fun getLivedataObserver(isRefresh: Boolean) {
         contactsListViewModel.liveDatalistofContacts.observe(viewLifecycleOwner, Observer {
             when(it) {
                 is FollowData.Loading -> {
@@ -104,7 +105,11 @@ open class ContactsListFragment : Fragment() {
                 }
 
                 is FollowData.Success -> {
-                    addDatatoDatabase(it.isSuccess)
+                    if (isRefresh){
+                        refreshData(it.isSuccess)
+                    }else{
+                        addDatatoDatabase(it.isSuccess)
+                    }
 
                 }
             }
@@ -122,7 +127,7 @@ open class ContactsListFragment : Fragment() {
             )
             contactsList.add(dbContact)
         }
-        databaseViewModel.insert(contactsList)
+        contactsListViewModel.insert(contactsList)
         binding?.progressBar?.isVisible = false
 
         lifecycleScope.launch {
@@ -132,8 +137,21 @@ open class ContactsListFragment : Fragment() {
         getDataFromDatabase()
 
     }
+    private fun refreshData(success: List<ApiContact>) {
+        for(contact in success){
+            val dbContact=contact.todbContact()
+            if (!GlobalFactory.deletedItems.contains(dbContact) && !refreshList.contains(contact)){
+                refreshList.add(contact)
+            }
+
+        }
+        addDatatoDatabase(refreshList)
+        binding?.progressBar?.isVisible = false
+        isRefresh=false
+
+    }
     private fun getDataFromDatabase(){
-        databaseViewModel.getAllContacts().observe(viewLifecycleOwner, Observer {contacts->
+        contactsListViewModel.getAllFromDatabaseContacts().observe(viewLifecycleOwner, Observer {contacts->
             contacts?.let {
                 contactAdapter.items = it
             }
@@ -145,7 +163,8 @@ open class ContactsListFragment : Fragment() {
     private fun swipetodelete() {
         val swipeToDelete=object: SwipeToDelete(){
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                databaseViewModel.getContactDeleteById(contactAdapter.items[viewHolder.adapterPosition].id)
+                contactsListViewModel.getContactDeleteById(contactAdapter.items[viewHolder.adapterPosition].id)
+                GlobalFactory.deletedItems.add(contactAdapter.items[viewHolder.adapterPosition])
                 contactAdapter.notifyDataSetChanged()
             }
 

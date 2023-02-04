@@ -14,7 +14,6 @@ import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.vholodynskyi.assignment.R
 import com.vholodynskyi.assignment.databinding.FragmentDetailsBinding
-import com.vholodynskyi.assignment.db.DatabaseViewModel
 import com.vholodynskyi.assignment.di.GlobalFactory
 import kotlinx.coroutines.launch
 
@@ -22,7 +21,7 @@ import kotlinx.coroutines.launch
 open class DetailsFragment : Fragment() {
     var binding: FragmentDetailsBinding? = null
 
-    private val databaseViewModel by activityViewModels<DatabaseViewModel> { GlobalFactory }
+    private val databaseViewModel by activityViewModels<DetailsViewModel> { GlobalFactory }
     private val args:DetailsFragmentArgs by navArgs()
 
     override fun onCreateView(
@@ -55,6 +54,7 @@ open class DetailsFragment : Fragment() {
 
         binding!!.delete.setOnClickListener {
             databaseViewModel.getContactDeleteById(args.id)
+            GlobalFactory.deletedItems.add(databaseViewModel.contact.value!!)
             findNavController().navigate(R.id.action_details_to_contactList1)
         }
 

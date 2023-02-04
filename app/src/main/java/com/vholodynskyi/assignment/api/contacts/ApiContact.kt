@@ -2,6 +2,7 @@ package com.vholodynskyi.assignment.api.contacts
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
+import com.vholodynskyi.assignment.db.contacts.DbContact
 
 @JsonClass(generateAdapter = true)
 data class ApiContact(
@@ -25,3 +26,13 @@ data class Picture(
     val medium: String?,
     val thumbnail: String?
 )
+
+fun ApiContact.todbContact(): DbContact {
+    return DbContact(
+        0,
+        firstName = name?.firstName,
+        lastName = name?.lastName,
+        email = email,
+        photo = picture?.medium
+    )
+}
