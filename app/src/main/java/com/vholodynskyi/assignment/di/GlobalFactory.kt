@@ -13,10 +13,7 @@ import com.vholodynskyi.assignment.presentation.details.DetailsViewModel
 import com.vholodynskyi.assignment.presentation.contactslist.ContactsListViewModel
 import com.vholodynskyi.assignment.common.CustomDelegate
 import com.vholodynskyi.assignment.data.api.repository.RemoteRepository
-import com.vholodynskyi.assignment.domain.usecases.DeleteContactByIDUsecases
-import com.vholodynskyi.assignment.domain.usecases.GetAllContactListUsecases
-import com.vholodynskyi.assignment.domain.usecases.GetContactByIDUsecases
-import com.vholodynskyi.assignment.domain.usecases.InsertContactsUsecases
+import com.vholodynskyi.assignment.domain.usecases.*
 
 object GlobalFactory: ViewModelProvider.Factory {
 
@@ -45,7 +42,8 @@ object GlobalFactory: ViewModelProvider.Factory {
                 DeleteContactByIDUsecases(Repository(db.userDao()))
             )
             DetailsViewModel::class.java -> DetailsViewModel(DeleteContactByIDUsecases(Repository(db.userDao())),
-                GetContactByIDUsecases(Repository(db.userDao())))
+                GetContactByIDUsecases(Repository(db.userDao())), UpdateContactUsecases(Repository(db.userDao()))
+            )
             else -> throw IllegalArgumentException("Cannot create factory for ${modelClass.simpleName}")
         } as T
     }

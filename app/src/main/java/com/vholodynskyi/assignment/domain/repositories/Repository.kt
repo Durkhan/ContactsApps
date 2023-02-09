@@ -25,5 +25,9 @@ class Repository(private var contactsDao: ContactsDao) {
     fun getContactById(id: Int): DbContact {
         return contactsDao.getContactById(id)
     }
-
+    fun update(dbContact: DbContact) {
+        CoroutineScope(Dispatchers.IO).launch {
+            contactsDao.update(dbContact)
+        }
+    }
 }

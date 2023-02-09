@@ -7,13 +7,15 @@ import com.vholodynskyi.assignment.common.Resource
 import com.vholodynskyi.assignment.data.db.contacts.DbContact
 import com.vholodynskyi.assignment.domain.usecases.DeleteContactByIDUsecases
 import com.vholodynskyi.assignment.domain.usecases.GetContactByIDUsecases
+import com.vholodynskyi.assignment.domain.usecases.UpdateContactUsecases
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class DetailsViewModel(var deleteContactBYIDUsecases: DeleteContactByIDUsecases,
-                       var getContactByIDUsecases: GetContactByIDUsecases
+                       var getContactByIDUsecases: GetContactByIDUsecases,
+                       var updateContactUsecases: UpdateContactUsecases
 ) : ViewModel() {
     var contact = MutableLiveData<DbContact>()
 
@@ -45,6 +47,17 @@ class DetailsViewModel(var deleteContactBYIDUsecases: DeleteContactByIDUsecases,
         }
 
     }
-
+    fun update (contact: DbContact){
+        viewModelScope.launch {
+            updateContactUsecases.invoke(contact).collect {
+                when(it){
+                    is Resource.Error ->{
+                        Log.d("Error",it.message!!)
+                    }
+                    else -> {}
+                }
+            }
+        }
+    }
 
 }

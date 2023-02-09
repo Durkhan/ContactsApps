@@ -13,6 +13,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.vholodynskyi.assignment.R
+import com.vholodynskyi.assignment.data.db.contacts.DbContact
 import com.vholodynskyi.assignment.databinding.FragmentDetailsBinding
 import com.vholodynskyi.assignment.di.GlobalFactory
 import kotlinx.coroutines.launch
@@ -50,7 +51,21 @@ open class DetailsFragment : Fragment() {
                 }
             })
         }
+        val changeName=binding?.changeName?.text
+        binding?.change?.setOnClickListener {
+            if (!changeName!!.isEmpty()){
+                val dbContact= DbContact(
+                    args.id,
+                    changeName.toString(),
+                    databaseViewModel.contact.value?.lastName,
+                    databaseViewModel.contact.value?.email,
+                    databaseViewModel.contact.value?.photo
+                )
+                databaseViewModel.update(dbContact)
+                findNavController().navigate(R.id.action_details_to_contactList1)
+            }
 
+        }
 
         binding!!.delete.setOnClickListener {
             databaseViewModel.getContactDeleteById(args.id)
